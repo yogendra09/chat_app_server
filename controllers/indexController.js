@@ -9,6 +9,7 @@ exports.home = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.currentUser = catchAsyncErrors(async (req, res, next) => {
+  
   const user = await userModel.findById(req.id);
   res.json(user);
 });
