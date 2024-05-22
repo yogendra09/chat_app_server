@@ -4,8 +4,8 @@ const ErrorHandler = require("../utils/ErrorHandler");
 const { catchAsyncErrors } = require("./catchAsyncErrors");
 
 exports.isAuthenticated = catchAsyncErrors(async (req, res, next) => {
-  const authHeader = req.headers['Authorization']
-  console.log(req,authHeader)
+  const authHeader = req.headers['authorization']
+  console.log(req,authHeader,req.body.headers.Authorization)
   const { token } = req.cookies;
 
   if (!token) {
