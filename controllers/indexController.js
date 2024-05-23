@@ -20,22 +20,18 @@ exports.userResgister = catchAsyncErrors(async (req, res, next) => {
   sendToken(newUser, 200, res);
 });
 exports.userLogout = catchAsyncErrors(async (req, res, next) => {
-  // const user = req.user;
-  // const token = user.getjwttoken();
+  const user = req.user;
+  const token = user.getjwttoken();
 
-  // const option = {
-  //   exipres: new Date(),
-  //   httpOnly: true,
-  //   // secure:true
-  // };
-  const revokedTokens = new Set();
-  const authToken = req.body.headers.Authorization;
-  revokedTokens.add(authToken);
-  res.json({ message: "user logout!" });
-  // res
-  //   .status(200)
-  //   .cookie("token",'', option)
-  //   .json({ message: "user logout!" });
+  const option = {
+    exipres: new Date(),
+    httpOnly: true,
+    // secure:true
+  };
+  res
+    .status(200)
+    .cookie("token",'', option)
+    .json({ message: "user logout!" });
 });
 
 exports.userLogin = catchAsyncErrors(async (req, res, next) => {
