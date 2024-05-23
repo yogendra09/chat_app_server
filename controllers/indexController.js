@@ -25,8 +25,8 @@ exports.userLogout = catchAsyncErrors(async (req, res, next) => {
 
   const option = {
     exipres: new Date(),
-    httpOnly: true,
-    // secure:true
+    // httpOnly: true,
+    secure:true
   };
   res
     .status(200)
