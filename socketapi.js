@@ -25,8 +25,8 @@ const createSocketServer = (server) => {
       );
 
       const activeUsers = await userModel.find({
-        socketId: { $nin: ["", socket.id] },
-        // username: { $nin: data.user },
+        // socketId: { $nin: ["", socket.id] },
+        username: { $nin: data.user },
       });
 
       // console.log(activeUsers)
