@@ -3,7 +3,7 @@ const userModel = require("./models/userModel");
 const chatModel = require("./models/chatModel");
 
 const createSocketServer = (server) => {
-  const io =  socket(server, {
+  const io = socket(server, {
     cors: {
       origin: "*",
       methods: ["GET", "POST"],
@@ -25,8 +25,8 @@ const createSocketServer = (server) => {
       );
 
       const activeUsers = await userModel.find({
-        // socketId: { $nin: ["", socket.id] },
-        username: { $nin: data.user },
+        socketId: { $nin: ["", socket.id] },
+        // username: { $nin: data.user },
       });
 
       // console.log(activeUsers)
@@ -39,8 +39,8 @@ const createSocketServer = (server) => {
       });
 
       if (!receiverUser.chats.includes(message.sender)) {
-        receiverUser.chats.push(message.sender);
-        currentUser.chats.push(message.receiver);
+        receiverUser?.chats?.push(message.sender);
+        currentUser?.chats?.push(message.receiver);
         await currentUser.save();
         await receiverUser.save();
       }
@@ -83,11 +83,9 @@ const createSocketServer = (server) => {
         {
           socketId: "",
         }
-        
       );
     });
   });
 };
 
-
-module.exports = {createSocketServer}
+module.exports = { createSocketServer };
