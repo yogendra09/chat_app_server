@@ -1,7 +1,7 @@
 const socket = require("socket.io");
 const userModel = require("./models/userModel");
 const chatModel = require("./models/chatModel");
-
+const groupModel = require("./models/groupModel");
 const createSocketServer = (server) => {
   const io = socket(server, {
     cors: {
@@ -16,7 +16,6 @@ const createSocketServer = (server) => {
     socket.on("server_joined", async (data) => {
       currentUser = await userModel.findOne({ username: data.user });
 
-      console.log(data);
       await userModel.findOneAndUpdate(
         { username: data.user },
         {
@@ -26,11 +25,21 @@ const createSocketServer = (server) => {
 
       const activeUsers = await userModel.find({
         socketId: { $nin: ["", socket.id] },
-        // username: { $nin: data.user },
       });
 
+      const allGroups = await groupModel.find({
+        users: {
+          $in: [currentUser._id],
+        },
+      });
+      console.log(allGroups);
+      allGroups.forEach((group) => {
+        socket.emit("group-joined", group);
+      });
+  
+      
       // console.log(activeUsers)
-      socket.emit("activeUsers", activeUsers);
+      socket.emit("activeUsers", {activeUsers,allGroups});
     });
 
     socket.on("sendPrivateMessage", async (message) => {
@@ -57,22 +66,69 @@ const createSocketServer = (server) => {
     });
 
     socket.on("fetchMessages", async (data) => {
-      console.log(data.receiver.username);
-      const allMessages = await chatModel.find({
-        $or: [
-          {
-            sender: data.sender.username,
-            receiver: data.receiver.username,
-          },
-          {
-            sender: data.receiver.username,
-            receiver: data.sender.username,
-          },
-        ],
+      const isUser = await user.findOne({
+        username: conversationDetails.receiver /* insta */,
       });
 
-      socket.emit("fetchPrivateMessages", allMessages);
+      if (user) {
+        const allMessages = await chatModel.find({
+          $or: [
+            {
+              sender: data.sender.username,
+              receiver: data.receiver.username,
+            },
+            {
+              sender: data.receiver.username,
+              receiver: data.sender.username,
+            },
+          ],
+        });
+
+        socket.emit("fetchPrivateMessages", allMessages);
+      } else {
+        const allMessages = await messageModel.find({
+          receiver: conversationDetails.receiver /* insta */,
+        });
+
+        socket.emit("send-conversation", allMessages);
+      }
     });
+
+
+    socket.on('create-new-group', async groupDetails => {
+
+      const newGroup = await groupModel.create({
+          name: groupDetails.groupName
+      })
+
+      const currentUser = await user.findOne({
+          username: groupDetails.sender
+      })
+      newGroup.users.push(currentUser._id)
+      await newGroup.save()
+
+      socket.emit("group-created", newGroup)
+  })
+
+  socket.on("join-group", async joiningDetails => {
+      const group = await groupModel.findOne({
+          name: joiningDetails.groupName
+      })
+
+      const currentUser = await user.findOne({
+          username: joiningDetails.sender
+      })
+
+      group.users.push(currentUser._id)
+
+      await group.save()
+
+      socket.emit('group-joined', {
+          profileImage: group.profileImage,
+          name: group.name
+      })
+
+  });
 
     socket.on("disconnect", async () => {
       console.log("A user disconnected!");
