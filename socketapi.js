@@ -67,7 +67,7 @@ const createSocketServer = (server) => {
 
     socket.on("fetchMessages", async (data) => {
       const isUser = await userModel.findOne({
-        username: conversationDetails.receiver /* insta */,
+        username: data.receiver.username /* insta */,
       });
 
       if (isUser) {
