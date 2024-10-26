@@ -32,11 +32,11 @@ const createSocketServer = (server) => {
           $in: [currentUser._id],
         },
       });
-      console.log(allGroups);
       allGroups.forEach((group) => {
         socket.emit("group-joined", group);
       });
-  
+      
+      console.log(allGroups);
       
       // console.log(activeUsers)
       socket.emit("activeUsers", {activeUsers,allGroups});
@@ -95,19 +95,19 @@ const createSocketServer = (server) => {
     });
 
 
-    socket.on('create-new-group', async groupDetails => {
-
+    socket.on('create-new-group', async (groupDetails) => {
+      const currentUser = await user.findOne({
+        username: groupDetails.sender
+    })
       const newGroup = await groupModel.create({
           name: groupDetails.groupName
       })
 
-      const currentUser = await user.findOne({
-          username: groupDetails.sender
-      })
-      newGroup.users.push(currentUser._id)
+     await newGroup.users.push(currentUser._id);
       await newGroup.save()
 
       socket.emit("group-created", newGroup)
+
   })
 
   socket.on("join-group", async joiningDetails => {
