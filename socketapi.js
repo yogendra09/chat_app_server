@@ -96,7 +96,7 @@ const createSocketServer = (server) => {
 
 
     socket.on('create-new-group', async (groupDetails) => {
-      const currentUser = await user.findOne({
+      const currentUser = await userModel.findOne({
         username: groupDetails.sender
     })
       const newGroup = await groupModel.create({
