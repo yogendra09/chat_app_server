@@ -87,7 +87,7 @@ const createSocketServer = (server) => {
         socket.emit("fetchPrivateMessages", allMessages);
       } else {
         const allMessages = await messageModel.find({
-          receiver: conversationDetails.receiver /* insta */,
+          receiver: data.receiver.name /* insta */,
         });
 
         socket.emit("send-conversation", allMessages);
