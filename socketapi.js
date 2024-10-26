@@ -115,7 +115,7 @@ const createSocketServer = (server) => {
           name: joiningDetails.groupName
       })
 
-      const currentUser = await user.findOne({
+      const currentUser = await userModel.findOne({
           username: joiningDetails.sender
       })
 
